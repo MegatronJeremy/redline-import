@@ -4,7 +4,7 @@ Import `.docx` files into your vault as Markdown notes. Comments, footnotes and 
 
 > **AI-assisted.** This plugin and this README were written with AI assistance (Claude) by Quillfern (AI-assisted), a small AI-assisted studio, and reviewed before release. The code is open source under the MIT licence.
 
-> **Payment required for some features.** Single-file import is free. Tracked-changes marking and batch import need **Redline Import Pro**, a separate one-time purchase on Gumroad. Pro is not on sale yet; this README will carry the purchase link when it is. The free version is not time-limited.
+> **Payment required for some features.** Single-file import is free. Tracked-changes marking and batch import need **Redline Import Pro**, a separate one-time purchase on Gumroad. Buy it here: https://xparhyx.gumroad.com/l/krpith ($12, one-time). The free version is not time-limited.
 
 ## Free version
 
@@ -30,7 +30,7 @@ Not included: exporting notes back to Word. This plugin only imports, and no rou
 
 ### Buying and activating Pro
 
-1. Buy Redline Import Pro on Gumroad ($12, one-time). The link will be added here once the listing is live.
+1. Buy Redline Import Pro on Gumroad: https://xparhyx.gumroad.com/l/krpith ($12, one-time).
 2. Gumroad emails you a licence key.
 3. In Obsidian: Settings → Community plugins → Redline Import → paste the key → **Verify**.
 
@@ -59,8 +59,9 @@ Keys from refunded or charged-back purchases fail verification. Pro stays active
   - In Mark mode, an insertion nested inside a deletion is shown as part of the deletion.
   - Moved text is shown as a deletion at the old place plus an insertion at the new place, not as a "move".
 - **Tests used synthetic files**: documents built by us for the tests, with invented reviewer names. **No file saved by Microsoft Word or LibreOffice was tested**, so real-world files may behave differently.
-- **Two runs in the real app, Obsidian 1.13.7 on Linux desktop.** (1) An earlier build that differs from the release build in how comments are numbered and how image file names and links are chosen: it covered Pro paths (tracked-changes mark/accept/reject, 3-file batch), with **Pro forced on in the test setup, not unlocked with a licence key**. (2) The exact release build (`main.js` sha256 f96c5da1…): plugin loads, free import, re-import with an image-name collision (second image saved with a " (1)" suffix and the second note links to it), comments, footnotes. The Pro paths were **not** re-run on the release build; they are covered by automated tests only. In both runs the operating-system file picker was bypassed (the plugin's own import code ran, the dialog did not).
-- **The licence check against the live Gumroad service has not been run** (Pro is not on sale yet).
+- **Two runs in the real app, Obsidian 1.13.7 on Linux desktop.** (1) An earlier build that differs from the release build in how comments are numbered and how image file names and links are chosen: it covered Pro paths (tracked-changes mark/accept/reject, 3-file batch), with **Pro forced on in the test setup, not unlocked with a licence key**. (2) The 0.1.0 build (`main.js` sha256 f96c5da1…): plugin loads, free import, re-import with an image-name collision (second image saved with a " (1)" suffix and the second note links to it), comments, footnotes. The Pro paths were **not** re-run on the release build; they are covered by automated tests only. 0.1.1 differs from the 0.1.0 build only in the Gumroad product id set in `src/config.ts`; the real-app run was not repeated on 0.1.1. In both runs the operating-system file picker was bypassed (the plugin's own import code ran, the dialog did not).
+- **The licence check against the live Gumroad service has not been run** (activation not yet confirmed with a real purchase).
+- **The first buyers are that test.** The licence check has not yet been confirmed by a paid purchase. If your key does not verify, reply to your Gumroad receipt and the purchase is refunded in full.
 - Not tested on Windows, macOS or mobile (the plugin is desktop-only). The minimum Obsidian version, 1.5.0, is an estimate; only 1.13.7 was used.
 - Password-protected files and old `.doc` files are not supported.
 - See TESTED.md for the full record.
