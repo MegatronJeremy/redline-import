@@ -1,5 +1,6 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting, normalizePath, requestUrl } from "obsidian";
 import { convertDocx } from "./convert";
+import { linkFor, uniquePath } from "./paths";
 import type { TrackedMode } from "./prepass";
 import { HOW_TO_GET_PRO_URL } from "./config";
 import { verifyLicense, type HttpPost } from "./license";
@@ -99,11 +100,8 @@ export default class RedlineImport extends Plugin {
     if (!this.app.vault.getAbstractFileByPath(p)) await this.app.vault.createFolder(p);
   }
 
-  private unique(base: string, ext: string): string {
-    let path = normalizePath(`${base}.${ext}`);
-    let n = 1;
-    while (this.app.vault.getAbstractFileByPath(path)) path = normalizePath(`${base} (${n++}).${ext}`);
-    return path;
+  private unique(base: string, ext: string, reserved?: Set<string>): string {
+    return uniquePath((p) => !!this.app.vault.getAbstractFileByPath(p), normalizePath(base), ext, reserved);
   }
 
   private async importOne(name: string, bytes: Uint8Array): Promise<string> {
@@ -111,14 +109,21 @@ export default class RedlineImport extends Plugin {
     const title = safeName(name);
     const mode: TrackedMode = this.gate.has("trackedChanges") ? s.trackedMode : "accept";
     const att = s.attachmentsFolder.trim();
+    // Pick each image's saved path first and link to exactly that path.
+    const reserved = new Set<string>();
+    const imagePaths = new Map<number, string>();
     const result = await convertDocx(bytes, {
       tracked: mode,
       comments: s.importComments,
-      imageLink: (i, ext) => `${att ? att + "/" : ""}${title}-image-${i}.${ext}`.split("/").map(encodeURIComponent).join("/"),
+      imageLink: (i, ext) => {
+        const p = this.unique(`${att ? att + "/" : ""}${title}-image-${i}`, ext, reserved);
+        imagePaths.set(i, p);
+        return linkFor(p);
+      },
     });
     if (result.images.length) await this.ensureFolder(att);
     for (const img of result.images) {
-      const p = this.unique(normalizePath(`${att ? att + "/" : ""}${title}-image-${img.index}`), img.ext);
+      const p = imagePaths.get(img.index)!;
       await this.app.vault.createBinary(p, img.data.buffer.slice(img.data.byteOffset, img.data.byteOffset + img.data.byteLength) as ArrayBuffer);
     }
     await this.ensureFolder(s.outputFolder.trim());

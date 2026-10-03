@@ -56,9 +56,10 @@ Keys from refunded or charged-back purchases fail verification. Pro stays active
   - Changes to a paragraph mark (a merged or split paragraph) are ignored.
   - Formatting changes that Word tracks (bold, style, paragraph format) are ignored.
   - Changes inside text boxes are not handled.
+  - In Mark mode, an insertion nested inside a deletion is shown as part of the deletion.
   - Moved text is shown as a deletion at the old place plus an insertion at the new place, not as a "move".
 - **Tests used synthetic files**: documents built by us for the tests, with invented reviewer names. **No file saved by Microsoft Word or LibreOffice was tested**, so real-world files may behave differently.
-- **One run in the real app**: Obsidian 1.13.7 on Linux desktop, on an earlier build that differs from the release build only in how comments are numbered. A repeat run on the exact release build is pending. In that run **Pro was forced on in the test setup, not unlocked with a licence key**, and the file picker was bypassed (the plugin's own import code ran, the operating-system dialog did not).
+- **Two runs in the real app, Obsidian 1.13.7 on Linux desktop.** (1) An earlier build that differs from the release build in how comments are numbered and how image file names and links are chosen: it covered Pro paths (tracked-changes mark/accept/reject, 3-file batch), with **Pro forced on in the test setup, not unlocked with a licence key**. (2) The exact release build (`main.js` sha256 f96c5da1…): plugin loads, free import, re-import with an image-name collision (second image saved with a " (1)" suffix and the second note links to it), comments, footnotes. The Pro paths were **not** re-run on the release build; they are covered by automated tests only. In both runs the operating-system file picker was bypassed (the plugin's own import code ran, the dialog did not).
 - **The licence check against the live Gumroad service has not been run** (Pro is not on sale yet).
 - Not tested on Windows, macOS or mobile (the plugin is desktop-only). The minimum Obsidian version, 1.5.0, is an estimate; only 1.13.7 was used.
 - Password-protected files and old `.doc` files are not supported.
