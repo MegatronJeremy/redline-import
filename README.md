@@ -34,12 +34,12 @@ Not included: exporting notes back to Word. This plugin only imports, and no rou
 2. Gumroad emails you a licence key.
 3. In Obsidian: Settings → Community plugins → Redline Import → paste the key → **Verify**.
 
-Keys from refunded or charged-back purchases fail verification. Pro stays active offline until you press **Re-check**; the plugin never re-checks by itself.
+If Pro doesn't work for you, or isn't what you expected, reply to your Gumroad receipt email within 30 days and we will refund you in full. Keys from refunded or charged-back purchases fail verification. Pro stays active offline until you press **Re-check**; the plugin never re-checks by itself.
 
 ## Network use, privacy and data
 
 - **One network call, only when you press Verify / Re-check**: the plugin sends your licence key and the Pro product id to `https://api.gumroad.com/v2/licenses/verify` (Gumroad's licence API). It does not increase the licence's use count. Nothing else is sent.
-- The settings tab has a "How to get Pro" link to this README. It opens in your browser only when you click it; the plugin loads nothing for it.
+- The settings tab has a "Get a licence key" link to this README. It opens in your browser only when you click it; the plugin loads nothing for it.
 - **No network call at startup, in the background, or during import.** Importing works fully offline.
 - **No telemetry, analytics, ads or tracking.** No server of ours is involved.
 - Your licence key and settings are stored locally in the plugin's `data.json` inside your vault. Your documents never leave your computer.
@@ -59,9 +59,9 @@ Keys from refunded or charged-back purchases fail verification. Pro stays active
   - In Mark mode, an insertion nested inside a deletion is shown as part of the deletion.
   - Moved text is shown as a deletion at the old place plus an insertion at the new place, not as a "move".
 - **Tests used synthetic files**: documents built by us for the tests, with invented reviewer names. **No file saved by Microsoft Word or LibreOffice was tested**, so real-world files may behave differently.
-- **Two runs in the real app, Obsidian 1.13.7 on Linux desktop.** (1) An earlier build that differs from the release build in how comments are numbered and how image file names and links are chosen: it covered Pro paths (tracked-changes mark/accept/reject, 3-file batch), with **Pro forced on in the test setup, not unlocked with a licence key**. (2) The 0.1.0 build (`main.js` sha256 f96c5da1…): plugin loads, free import, re-import with an image-name collision (second image saved with a " (1)" suffix and the second note links to it), comments, footnotes. The Pro paths were **not** re-run on the release build; they are covered by automated tests only. 0.1.1 differs from the 0.1.0 build only in the Gumroad product id set in `src/config.ts`; the real-app run was not repeated on 0.1.1. In both runs the operating-system file picker was bypassed (the plugin's own import code ran, the dialog did not).
-- **The licence check against the live Gumroad service has not been run** (activation not yet confirmed with a real purchase).
-- **The first buyers are that test.** The licence check has not yet been confirmed by a paid purchase. If your key does not verify, reply to your Gumroad receipt and the purchase is refunded in full.
+- **Real-app testing: Obsidian 1.13.7 on Linux desktop, exact 0.1.3 build** (`main.js` sha256 70e1c169…). Plugin loads; free import (comments with a reply thread, footnote, image extraction); free batch is blocked with the licence notice; Pro mark, accept, reject and a 3-file batch work, with **Pro forced on in the test setup, not unlocked with a real licence key**; Verify with an invalid key shows "Gumroad does not recognise this licence key." and saves nothing. The operating-system file picker was bypassed (the plugin's own import code ran, the dialog did not).
+- **A valid licence key has not been verified against the live Gumroad service yet**; only the rejection of an invalid key was observed.
+- **The first buyers are that test.** If your key does not verify, reply to your Gumroad receipt and the purchase is refunded in full.
 - Not tested on Windows, macOS or mobile (the plugin is desktop-only). The minimum Obsidian version, 1.5.0, is an estimate; only 1.13.7 was used.
 - Password-protected files and old `.doc` files are not supported.
 - See TESTED.md for the full record.

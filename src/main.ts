@@ -31,7 +31,7 @@ const MAX_BYTES = 50 * 1024 * 1024;
 /** Adapt Obsidian's requestUrl to the fetch-like shape license.ts expects. */
 const obsidianPost: HttpPost = async (url, init) => {
   const r = await requestUrl({ url, method: init.method, headers: init.headers, body: init.body, throw: false });
-  return { status: r.status, json: async () => r.json };
+  return { status: r.status, json: () => Promise.resolve(r.json as unknown) };
 };
 
 const safeName = (s: string) => s.replace(/[\\/:*?"<>|#^[\]]/g, "-").trim() || "Imported";
@@ -49,7 +49,8 @@ export default class RedlineImport extends Plugin {
   }
 
   async onload() {
-    this.settings = { ...DEFAULTS, ...(await this.loadData()) };
+    const saved = (await this.loadData()) as Partial<Settings> | null;
+    this.settings = { ...DEFAULTS, ...saved };
     this.addSettingTab(new ImportSettingTab(this.app, this));
     this.addCommand({ id: "import-docx", name: "Import a .docx file", callback: () => this.pick(false) });
     this.addCommand({ id: "import-docx-batch", name: "Import several .docx files (Pro)", callback: () => this.pick(true) });
@@ -63,10 +64,10 @@ export default class RedlineImport extends Plugin {
   /** Open the system file picker (desktop only plugin; no vault access beyond what the user picks). */
   private pick(batch: boolean) {
     if (batch && !this.gate.has("batch")) {
-      new Notice("Batch import is a Pro feature. Enter your licence key in the plugin settings.");
+      new Notice("Batch import needs a paid licence. Enter your licence key in the plugin settings.");
       return;
     }
-    const input = document.createElement("input");
+    const input = createEl("input");
     input.type = "file";
     input.accept = ".docx";
     input.multiple = batch;
@@ -123,7 +124,8 @@ export default class RedlineImport extends Plugin {
     });
     if (result.images.length) await this.ensureFolder(att);
     for (const img of result.images) {
-      const p = imagePaths.get(img.index)!;
+      const p = imagePaths.get(img.index);
+      if (!p) continue;
       await this.app.vault.createBinary(p, img.data.buffer.slice(img.data.byteOffset, img.data.byteOffset + img.data.byteLength) as ArrayBuffer);
     }
     await this.ensureFolder(s.outputFolder.trim());
@@ -146,25 +148,25 @@ class ImportSettingTab extends PluginSettingTab {
 
     new Setting(el).setName("Import").setHeading();
     new Setting(el).setName("Output folder").setDesc("Vault folder for imported notes. Empty = vault root.").addText((t) =>
-      t.setValue(s.outputFolder).onChange(async (v) => {
+      t.setValue(s.outputFolder).onChange((v) => {
         s.outputFolder = v;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       }),
     );
     new Setting(el).setName("Attachments folder").setDesc("Vault folder for extracted images.").addText((t) =>
-      t.setValue(s.attachmentsFolder).onChange(async (v) => {
+      t.setValue(s.attachmentsFolder).onChange((v) => {
         s.attachmentsFolder = v;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       }),
     );
-    new Setting(el).setName("Import comments").setDesc("Comments become footnotes named c1, c2... with author and date.").addToggle((t) =>
-      t.setValue(s.importComments).onChange(async (v) => {
+    new Setting(el).setName("Import comments").setDesc("Comments become footnotes named c1, c2 and so on, with author and date.").addToggle((t) =>
+      t.setValue(s.importComments).onChange((v) => {
         s.importComments = v;
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
       }),
     );
 
-    new Setting(el).setName("Redline Import Pro").setHeading();
+    new Setting(el).setName("Pro licence").setHeading();
     el.createEl("p", {
       text:
         "Optional paid upgrade (one-time purchase on Gumroad). Pro unlocks: " +
@@ -172,20 +174,22 @@ class ImportSettingTab extends PluginSettingTab {
         ". Without Pro, tracked changes are accepted silently. Network use: pressing Verify sends your licence key and the product id to api.gumroad.com, once per press. Nothing else is ever sent. No telemetry.",
     });
     el.createEl("p", { text: s.proActive ? "Status: Pro active." : "Status: free version." });
-    el.createEl("p").createEl("a", { text: "How to get Pro", href: HOW_TO_GET_PRO_URL });
+    el.createEl("p").createEl("a", { text: "Get a licence key", href: HOW_TO_GET_PRO_URL });
     let key = s.licenseKey;
     new Setting(el)
       .setName("Licence key")
       .addText((t) => t.setPlaceholder("Paste your key").setValue(key).onChange((v) => (key = v)))
       .addButton((b) =>
-        b.setButtonText(s.proActive ? "Re-check" : "Verify").onClick(async () => {
+        b.setButtonText(s.proActive ? "Re-check" : "Verify").onClick(() => {
           b.setDisabled(true);
-          const r = await verifyLicense(key, obsidianPost);
-          s.proActive = r.status === "valid";
-          s.licenseKey = r.status === "valid" || r.status === "refunded" ? key.trim() : s.licenseKey;
-          await this.plugin.saveSettings();
-          new Notice(r.message);
-          this.display();
+          void (async () => {
+            const r = await verifyLicense(key, obsidianPost);
+            s.proActive = r.status === "valid";
+            s.licenseKey = r.status === "valid" || r.status === "refunded" ? key.trim() : s.licenseKey;
+            await this.plugin.saveSettings();
+            new Notice(r.message);
+            this.display();
+          })();
         }),
       );
 
@@ -196,9 +200,9 @@ class ImportSettingTab extends PluginSettingTab {
         .addOption("accept", "Accept all")
         .addOption("reject", "Reject all")
         .setValue(s.trackedMode)
-        .onChange(async (v) => {
+        .onChange((v) => {
           s.trackedMode = v as TrackedMode;
-          await this.plugin.saveSettings();
+          void this.plugin.saveSettings();
         }),
     );
   }

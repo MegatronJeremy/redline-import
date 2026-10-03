@@ -69,12 +69,12 @@ export async function convertDocx(input: Uint8Array, opts: ConvertOptions): Prom
   const byId = new Map(changes.map((c) => [c.id, c]));
   const meta = (c: Change) => ` <!-- ${c.type}${c.moved ? " (moved)" : ""}: ${safe(c.author) || "unknown"}${c.date ? ", " + safe(c.date) : ""} -->`;
   md = md
-    .replace(/⟦INS(\d+)⟧([\s\S]*?)⟦\/INS\1⟧/g, (_, id, t) => `==${t.trim()}==${meta(byId.get(+id)!)}`)
-    .replace(/⟦DEL(\d+)⟧([\s\S]*?)⟦\/DEL\1⟧/g, (_, id, t) => `~~${t.trim()}~~${meta(byId.get(+id)!)}`);
+    .replace(/⟦INS(\d+)⟧([\s\S]*?)⟦\/INS\1⟧/g, (_m: string, id: string, t: string) => `==${t.trim()}==${meta(byId.get(+id)!)}`)
+    .replace(/⟦DEL(\d+)⟧([\s\S]*?)⟦\/DEL\1⟧/g, (_m: string, id: string, t: string) => `~~${t.trim()}~~${meta(byId.get(+id)!)}`);
 
   const defs: string[] = [];
   const fnLabel = new Map(order.map((id, i) => [id, String(i + 1)]));
-  md = md.replace(/⟦FN(\d+)⟧/g, (_, id) => `[^${fnLabel.get(id)}]`);
+  md = md.replace(/⟦FN(\d+)⟧/g, (_m: string, id: string) => `[^${fnLabel.get(id)}]`);
   for (const id of order) {
     const f = footnotes.find((x) => x.id === id);
     if (f) defs.push(`[^${fnLabel.get(id)}]: ${td.turndown(f.html).trim().replace(/\n+/g, " ")}`);
@@ -82,7 +82,7 @@ export async function convertDocx(input: Uint8Array, opts: ConvertOptions): Prom
 
   const used: DocComment[] = [];
   const cLabel = (id: string) => `c${comments.findIndex((x) => x.id === id) + 1}`;
-  md = md.replace(/⟦CMT(\d+)⟧/g, (all, id) => {
+  md = md.replace(/⟦CMT(\d+)⟧/g, (_all: string, id: string) => {
     const c = comments.find((x) => x.id === id);
     if (!opts.comments || !c) return "";
     used.push(c);

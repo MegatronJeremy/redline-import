@@ -1,6 +1,6 @@
 {
   "name": "redline-import",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Import .docx files as notes with comments, footnotes and images. Optional paid Pro adds tracked changes and batch import.",
   "main": "main.js",
   "scripts": {
@@ -13,7 +13,6 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/turndown": "^5.0.5",
-    "builtin-modules": "^4.0.0",
     "esbuild": "^0.24.0",
     "obsidian": "^1.7.2",
     "typescript": "^5.6.0",
