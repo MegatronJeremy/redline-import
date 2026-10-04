@@ -1,5 +1,7 @@
 # Redline Import
 
+> **This project has moved and been renamed.** Redline Import is now **DOCX Review Import**: https://github.com/MegatronJeremy/docx-review-import . No further releases are planned here; the 0.1.3 release stays available. In the new version batch import is free and Pro is for tracked changes only.
+
 Import `.docx` files into your vault as Markdown notes. Comments, footnotes and images come along in the free version. Pro adds tracked changes shown as marked-up text, and batch import.
 
 > **AI-assisted.** This plugin and this README were written with AI assistance (Claude) by Quillfern (AI-assisted), a small AI-assisted studio, and reviewed before release. The code is open source under the MIT licence.
